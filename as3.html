@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Students Risk Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { font-size: 20px; margin: 0 0 12px; }
+    .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+    select, button { padding: 6px 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f4f4f4; text-align: left; cursor: default; }
+    th.sortable { cursor: pointer; user-select: none; }
+    tr.profile-row { background: #fff; }
+    tr.profile-row:hover { background: #fafafa; }
+    tr.details-row td { background: #fcfcff; padding: 0; }
+    .details { padding: 10px; display: none; }
+    .subtables { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .subtables table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .subtables th, .subtables td { border: 1px solid #eee; padding: 6px; }
+    .muted { color: #666; font-size: 12px; }
+
+    /* Loading overlay */
+    #loadingOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #bbb; border-top-color: #4a90e2; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <h1>Students Risk Dashboard</h1>
+  <div class="controls">
+    <label for="riskFilter">Filter by risk level:</label>
+    <select id="riskFilter">
+      <option value="all">All</option>
+      <option value="Low">Low</option>
+      <option value="Medium">Medium</option>
+      <option value="High">High</option>
+    </select>
+    <div style="flex:1"></div>
+    <div>
+      <span class="muted">Attendance &lt;</span>
+      <input id="thAttend" type="number" step="0.01" min="0" max="1" style="width:70px" />
+      <span class="muted">Assignment &lt;</span>
+      <input id="thAssign" type="number" step="0.01" min="0" max="1" style="width:70px" />
+      <span class="muted">Failed ≥</span>
+      <input id="thFailed" type="number" step="1" min="0" style="width:70px" />
+      <button id="applyCfgBtn" type="button">Apply Thresholds</button>
+    </div>
+    <button id="refreshBtn" type="button">Refresh</button>
+    <span class="muted" id="statusText"></span>
+  </div>
+
+  <table id="studentsTable">
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Name</th>
+        <th>Score</th>
+        <th id="riskHeader" class="sortable" title="Click to sort">Risk Level</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="studentsBody"></tbody>
+  </table>
+
+  <div id="loadingOverlay"><div class="spinner"></div></div>
+  <script src="./as3.js"></script>
+</body>
+</html>
+
